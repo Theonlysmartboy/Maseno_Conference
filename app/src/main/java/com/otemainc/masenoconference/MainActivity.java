@@ -1,14 +1,17 @@
 package com.otemainc.masenoconference;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -20,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private WebView webcontainer;
     private ProgressBar progressBar;
 
+    @SuppressLint("SetJavaScriptEnabled")
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         if(isNetworkAvailable()){
             WebSettings Settings = webcontainer.getSettings();
             Settings.setJavaScriptEnabled(true);
+            Settings.setMediaPlaybackRequiresUserGesture(false);
+            Settings.setJavaScriptCanOpenWindowsAutomatically(true);
+            Settings.setPluginState(WebSettings.PluginState.ON);
             webcontainer.loadUrl("http://conference.maseno.ac.ke/");
             webcontainer.setWebViewClient(new WebViewClient() {
                 @Override
@@ -76,7 +84,10 @@ public class MainActivity extends AppCompatActivity {
     }
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = null;
+        if (connectivityManager != null) {
+            activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        }
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
